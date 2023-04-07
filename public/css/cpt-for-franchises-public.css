@@ -142,14 +142,11 @@
 }
 
 .tab__actions .btn--white--alt{
-    padding: 15px 62px;
     background: #fff;
     text-transform: uppercase;
     color: #1b384d;
     font-size: 16px;
     font-weight: 900;
-    text-decoration: none !important;
-    line-height: 49px;
 }
 
 .tabs-franchise .tabs__nav {

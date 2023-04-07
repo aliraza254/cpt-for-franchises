@@ -108,30 +108,30 @@ class Cpt_For_Franchises_Short_Code {
     }
 
     public function search_post_form_function(){
-        $category = $_GET['category'];
-        $investment = $_GET['investment'];
+        $category = isset($_GET['category']) ? $_GET['category'] : '';
+        $investment = isset($_GET['investment']) ? $_GET['investment'] : '';
         $args = array(
             'post_type' => 'post',
             'post_status' => 'publish',
             'posts_per_page' => -1,
-            'tax_query' => array(
-                'relation' => 'OR',
-                array(
-                    'taxonomy' => 'category',
-                    'field' => 'id',
-                    'terms' => $category
-                )
-            ),
-            'meta_query' => array(
-                'relation' => 'OR',
-                array(
-                    'key' => '_custom_field',
-                    'value' => $investment,
-                    'compare' => '>=',
-                    'type' => 'NUMERIC'
-                )
-            )
+            'tax_query' => array(),
+            'meta_query' => array()
         );
+        if (!empty($category)) {
+            $args['tax_query'][] = array(
+                'taxonomy' => 'category',
+                'field' => 'id',
+                'terms' => $category
+            );
+        }
+        if (!empty($investment)) {
+            $args['meta_query'][] = array(
+                'key' => '_custom_field',
+                'value' => $investment,
+                'compare' => '>=',
+                'type' => 'NUMERIC'
+            );
+        }
         $results = new WP_Query( $args );
         $html = '';
         if ( $results->have_posts() ) {
@@ -141,54 +141,55 @@ class Cpt_For_Franchises_Short_Code {
                 $thumbnail_url = get_the_post_thumbnail_url(get_the_ID());
                 $custom_field_value = get_post_meta(get_the_ID(), '_custom_field', true);
                 $html .= '<div class="card">
-                    <div class="card__body">
-                        <a href="#" target="_self">
-                            <div class="card__image">
-                                <a href="' . esc_url(get_permalink()) . '">
-                                    <img width="180" height="120" src="' . ($thumbnail_url ? esc_url($thumbnail_url) : '') . '" class="">
-                                </a>
-                            </div>
+            <div class="card__body">
+                <a href="#" target="_self">
+                    <div class="card__image">
+                        <a href="' . esc_url(get_permalink()) . '">
+                            <img width="180" height="120" src="' . ($thumbnail_url ? esc_url($thumbnail_url) : '') . '" class="">
                         </a>
-                        <div class="card__entry">
-                            <div class="card__entry-inner" style="height: 258.6px;">
-                                <h3>
-                                    <a href="' . esc_url(get_permalink()) . '">' . get_the_title() . '</a>
-                                </h3>
-                                <p>' . get_the_excerpt() . '</p>
-                            </div>
-                            <div class="card__actions">
-                                <p>Cash Required: $' . esc_html($custom_field_value) . '</p>
-                                <label for="post-' . get_the_ID() . '" class="btn btn--blue btn--special">
-                                    <input type="checkbox" id="post-' . get_the_ID() . '" class="request-info-checkbox"> Request FREE Info
-                                </label>
-                            </div>
-                        </div>
                     </div>
-                </div>';
+                </a>
+                <div class="card__entry">
+                    <div class="card__entry-inner" style="height: 258.6px;">
+                        <h3>
+                            <a href="' . esc_url(get_permalink()) . '">' . get_the_title() . '</a>
+                        </h3>
+                        <p>' . get_the_excerpt() . '</p>
+                    </div>
+                    <div class="card__actions">
+                        <p>Cash Required: $' . esc_html($custom_field_value) . '</p>
+                        <label for="post-' . get_the_ID() . '" class="btn btn--blue btn--special">
+                            <input type="checkbox" id="post-' . get_the_ID() . '" class="request-info-checkbox"> Request FREE Info
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>';
             }
             wp_reset_postdata();
             $html .= '</div> 
-                <div class="bar-request isFixed" id="show-shell" style="display: none">
-                    <div class="shell">
-                        <div class="bar__body">
-                            <div class="bar__body-inner">
-                                <div class="bar__number">
-                                    <span>0</span>
-                                </div>
-                                <h6>Pending Request</h6>
-                            </div>
+        <div class="bar-request isFixed" id="show-shell" style="display: none">
+            <div class="shell">
+                <div class="bar__body">
+                    <div class="bar__body-inner">
+                        <div class="bar__number">
+                            <span>0</span>
                         </div>
-                        <div class="bar__actions">
-                            <button class="btn btn--simple">
-                                Complete Request >
-                            </button>
-                        </div>
+                        <h6>Pending Request</h6>
                     </div>
-                </div>';
+                </div>
+                <div class="bar__actions">
+                    <button class="btn btn--simple">
+                        Complete Request >
+                    </button>
+                </div>
+            </div>
+        </div>';
         } else {
             $html .= '<p>Sorry, no posts found!</p>';
         }
         return $html;
+
     }
 
     public function request_search_form_function(){
@@ -302,7 +303,7 @@ class Cpt_For_Franchises_Short_Code {
                                     'orderby'        => 'ID',
                                     'post_status'    => 'publish',
                                     'order'          => 'DESC',
-                                    'posts_per_page' => 8,
+                                    'posts_per_page' => 6,
                                     'tax_query'      => array(
                                         array(
                                             'taxonomy' => 'post_tag',
@@ -358,7 +359,7 @@ class Cpt_For_Franchises_Short_Code {
                                     'orderby'        => 'ID',
                                     'post_status'    => 'publish',
                                     'order'          => 'DESC',
-                                    'posts_per_page' => 8,
+                                    'posts_per_page' => 6,
                                     'tax_query'      => array(
                                         array(
                                             'taxonomy' => 'post_tag',
@@ -414,7 +415,7 @@ class Cpt_For_Franchises_Short_Code {
                                     'orderby'        => 'ID',
                                     'post_status'    => 'publish',
                                     'order'          => 'DESC',
-                                    'posts_per_page' => 8,
+                                    'posts_per_page' => 6,
                                     'tax_query'      => array(
                                         array(
                                             'taxonomy' => 'post_tag',
@@ -463,7 +464,9 @@ class Cpt_For_Franchises_Short_Code {
                         </div>
 
                         <div class="tab__actions" style="text-align: center;">
-                            <a href="<?php the_permalink(); ?>" class="btn btn--white--alt">See More</a>
+                            <form method="get" action="<?php echo esc_url( home_url( '/search-results/' ) ); ?>">
+                                <button type="submit" class="btn btn--white--alt">See More</button>
+                            </form>
                         </div>
 
                     </div>
