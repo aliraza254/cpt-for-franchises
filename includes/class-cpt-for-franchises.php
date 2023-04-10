@@ -181,6 +181,10 @@ class Cpt_For_Franchises {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'wp_ajax_add_post_in_session', $plugin_public, 'add_post_in_session' );
+		$this->loader->add_action( 'wp_ajax_nopriv_add_post_in_session', $plugin_public, 'add_post_in_session' );
+		$this->loader->add_action( 'wp_ajax_remove_post_in_session', $plugin_public, 'remove_post_in_session' );
+		$this->loader->add_action( 'wp_ajax_nopriv_remove_post_in_session', $plugin_public, 'remove_post_in_session' );
 
 	}
 
@@ -202,6 +206,7 @@ class Cpt_For_Franchises {
         add_shortcode( 'request_information', array($shortcode_admin, 'request_information_function') );
         add_shortcode( 'request_search_form', array($shortcode_admin, 'request_search_form_function') );
         add_shortcode( 'search_post_form', array($shortcode_admin, 'search_post_form_function') );
+        add_shortcode( 'single_post_btn', array($shortcode_admin, 'single_post_btn_function') );
     }
 
 	/**

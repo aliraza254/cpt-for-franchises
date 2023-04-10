@@ -97,7 +97,38 @@ class Cpt_For_Franchises_Public {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/cpt-for-franchises-public.js', array( 'jquery' ), $this->version, false );
+        wp_localize_script( $this->plugin_name, 'URL',array('ajax_url' => admin_url('admin-ajax.php'), 'redirect' => get_home_url()), array( 'jquery' ), $this->version, false );
 
 	}
+	public function add_post_in_session(){
+	    $post_id = $_POST['post_ids'];
+        $post_ids = (!empty($_COOKIE['post_ids'])) ? $_COOKIE['post_ids'] : '';
+        $posts = [];
+        if(!empty($post_ids)){
+            $posts = explode(',', $post_ids);
+            $posts[] = $post_id;
+            $posts = array_unique($posts);
+            setcookie('post_ids', implode(',', $posts), time() + (86400 * 30), "/");
+        }
+        else{
+            $posts[] = $post_id;
+            setcookie('post_ids', implode(',', $posts), time() + (86400 * 30), "/");
+        }
+        echo 100;
+	    die();
+    }
+	public function remove_post_in_session(){
+        $post_id = $_POST['post_id'];
+        $coockies = explode(',', $_COOKIE['post_ids']);
+        foreach ($coockies as $key => $single){
+            if($post_id == $single){
+                unset($coockies[$key]);
+            }
+        }
+//        $post_ids = implode(',', $coockies);
+        setcookie('post_ids', implode(',', $coockies), time() + (86400 * 30), "/");
+	    echo 100;
+	    die();
+    }
 
 }

@@ -52,29 +52,99 @@
 			}
 		});
 
-		$('.btn--simple').click(function() {
-			var post_ids = [];
-			$('.request-info-checkbox:input[type="checkbox"]:checked').each(function() {
-				post_ids.push($(this).attr('id').split('-')[1]);
-			});
-			if (post_ids.length > 0) {
-				var baseurl = window.location.origin+window.location.pathname;
-				var url = baseurl+"/request-information?franchise="+post_ids.join(',');
-				window.location.href = url;
+		function getCookie(c_name) {
+			var c_value = document.cookie,
+				c_start = c_value.indexOf(" " + c_name + "=");
+			if (c_start == -1) {
+				c_start = c_value.indexOf(c_name + "=");
 			}
+			if (c_start == -1) {
+				c_value = null;
+			} else {
+				c_start = c_value.indexOf("=", c_start) + 1;
+				var c_end = c_value.indexOf(";", c_start);
+				if (c_end == -1) {
+					c_end = c_value.length;
+				}
+				c_value = decodeURIComponent(c_value.substring(c_start, c_end));
+			}
+			return c_value;
+		}
+
+		$('#show-shell').hide();
+
+		var posts = getCookie("post_ids");
+		if (posts) {
+			var count = posts.split(',').length; // count the number of items in the cookie
+			$('#show-shell').show();
+			$(document).find('.bar__number span').text(count);
+		} else {
+			$('#show-shell').hide();
+		}
+
+		$('.btn--special').click(function() {
+			// $('#show-shell').hide();
+			var count = $('.request-info-checkbox:checked').length;
+			if(count > 0) {
+				// $(document).find('#sb_ajax_details').val(2);
+				$(document).find('.bar__number span').text(count);
+				$(this).addClass('sb_ajax');
+				$(document).find('.bar__number span').text(count);
+				var post_ids = $(this).find('input').attr('id').split('-')[1];
+				jQuery.ajax({
+					type: "POST",
+					url: URL.ajax_url,
+					data: {
+						action: "add_post_in_session",
+						post_ids: post_ids,
+					},
+					dataType: "json",
+					cache: false,
+					success: function (res) {
+						$('#show-shell').show();
+					}
+				});
+			}
+			else {
+				$('#show-shell').hide();
+			}
+		});
+
+		$('.btn--loog').click(function() {
+			window.location.href = URL.redirect+'/request-information';
+		});
+		$('.btn--single-post').click(function() {
+			var post_ids = $(this).data('id');
+			jQuery.ajax({
+				type: "POST",
+				url: URL.ajax_url,
+				data: {
+					action: "add_post_in_session",
+					post_ids: post_ids,
+				},
+				dataType: "json",
+				cache: false,
+				success: function (res) {
+					window.location.href = URL.redirect+'/request-information';
+				}
+			});
 		});
 
 		$('.remove_post').click(function() {
 			var post_id = $(this).data('post-id');
-			var post_ids = getParameterByName('franchise');
-			post_ids = post_ids.split(',').filter(function(id) {
-				return id != post_id;
-			}).join(',');
-			var url = window.location.href.split('?')[0];
-			if (post_ids !== '') {
-				url += '?franchise=' + post_ids;
-			}
-			window.location.href = url;
+			jQuery.ajax({
+				type: "POST",
+				url: URL.ajax_url,
+				data: {
+					action: "remove_post_in_session",
+					post_id: post_id,
+				},
+				dataType: "json",
+				cache: false,
+				success: function (res) {
+					window.location.reload();
+				}
+			});
 		});
 
 		function getParameterByName(name, url = window.location.href) {

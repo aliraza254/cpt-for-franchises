@@ -107,6 +107,17 @@ class Cpt_For_Franchises_Short_Code {
 
     }
 
+    public function single_post_btn_function(){
+        if( is_singular('post') ) {
+            $current_post_id = get_the_ID();
+            ?>
+            <div>
+                <button class="btn btn--simple btn--single-post" data-id="<?php echo $current_post_id;?>" > Request INFO </button>
+            </div>
+            <?php
+        }
+    }
+
     public function search_post_form_function(){
         $category = isset($_GET['category']) ? $_GET['category'] : '';
         $investment = isset($_GET['investment']) ? $_GET['investment'] : '';
@@ -135,6 +146,7 @@ class Cpt_For_Franchises_Short_Code {
         $results = new WP_Query( $args );
         $html = '';
         if ( $results->have_posts() ) {
+            $post_ids = explode(',', $_COOKIE['post_ids']);
             $html .= '<div class="cards" style="max-width: 100% !important;">';
             while ( $results->have_posts() ) {
                 $results->the_post();
@@ -179,7 +191,7 @@ class Cpt_For_Franchises_Short_Code {
                     </div>
                 </div>
                 <div class="bar__actions">
-                    <button class="btn btn--simple">
+                    <button class="btn btn--simple btn--loog ">
                         Complete Request >
                     </button>
                 </div>
@@ -473,7 +485,7 @@ class Cpt_For_Franchises_Short_Code {
 
                 </div>
             </div>
-
+            <input type="hidden" value="1" id="sb_ajax_details">
             <div class="bar-request isFixed" id="show-shell" style="display: none">
                 <div class="shell">
                     <div class="bar__body">
@@ -485,18 +497,20 @@ class Cpt_For_Franchises_Short_Code {
                         </div>
                     </div>
                     <div class="bar__actions">
-                        <button class="btn btn--simple">
+                        <button class="btn btn--simple btn--loog">
                             Complete Request >
                         </button>
                     </div>
                 </div>
             </div>
-
         </section>
         <?php
     }
 
     public function request_information_function(){
+        if(empty($_COOKIE['post_ids'])){
+            wp_safe_redirect(get_home_url());
+        }
         ?>
         <section class="wts_section-intro">
             <div class="wts_shell">
@@ -536,26 +550,30 @@ class Cpt_For_Franchises_Short_Code {
                                         <div class="form__row">
                                             <ul class="list-checkboxes list-checkboxes--remove">
                                                 <?php
-                                                $post_ids = explode(',', $_GET['franchise']);
-                                                $args = array(
-                                                    'post_type' => 'post',
-                                                    'post__in' => $post_ids,
-                                                    'orderby' => 'post__in'
-                                                );
-                                                $posts = get_posts($args);
-                                                foreach ($posts as $post) {
-                                                    $value = get_post_meta($post->ID, '_custom_field', true);
-                                                ?>
-                                                <li>
-                                                    <div class="checkbox checkbox--selected" style="width: 254px;">
-                                                        <label for="">
-                                                            <strong><?php echo $post->post_title?></strong>
-                                                            <span>[$<?php echo $value;?>] </span>
-                                                            <a href="javascript:void(0)" class="remove_post" data-post-id="<?php echo $post->ID;?>">X | Remove</a>
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <?php
+
+//                                                $post_ids = explode(',', $_GET['franchise']);
+                                                if(!empty($_COOKIE['post_ids'])){
+                                                    $post_ids = explode(',', $_COOKIE['post_ids']);
+                                                    $args = array(
+                                                        'post_type' => 'post',
+                                                        'post__in' => $post_ids,
+                                                        'orderby' => 'post__in'
+                                                    );
+                                                    $posts = get_posts($args);
+                                                    foreach ($posts as $post) {
+                                                        $value = get_post_meta($post->ID, '_custom_field', true);
+                                                        ?>
+                                                        <li>
+                                                            <div class="checkbox checkbox--selected" style="width: 254px;">
+                                                                <label for="">
+                                                                    <strong><?php echo $post->post_title?></strong>
+                                                                    <span>[$<?php echo $value;?>] </span>
+                                                                    <a href="javascript:void(0)" class="remove_post" data-post-id="<?php echo $post->ID;?>">X | Remove</a>
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                        <?php
+                                                    }
                                                 }
                                                 ?>
                                             </ul>
@@ -629,7 +647,6 @@ class Cpt_For_Franchises_Short_Code {
                                     </div>
 
                                 </div>
-
                             </div>
                         </aside>
 
@@ -645,7 +662,7 @@ class Cpt_For_Franchises_Short_Code {
                             </div>
 
                             <form  method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="information_form">
-                                <input type="hidden" name="franchise" value="<?php echo $_GET['franchise']; ?>">
+                                <input type="hidden" name="franchise" value="<?php echo $_COOKIE['post_ids']; ?>">
                                 <input type="hidden" name="recommended_franchise" value="">
                                 <input type="hidden" value="send_email_to_admin" name="action">
                                 <div class="wts_two_field_main">
@@ -763,8 +780,8 @@ class Cpt_For_Franchises_Short_Code {
             $titles .= '</td></tr>';
         }
         $titles .= '</table>';
+
         $email = get_option('admin_email');
-//        $email = 'itsbilalmahmood@gmail.com';
         $first_name = $_POST['first_name'];
         $last_name = $_POST['last_name'];
         $mobile_number = $_POST['mobile_number'];
@@ -780,59 +797,43 @@ class Cpt_For_Franchises_Short_Code {
         $marketing = $_POST['marketing'];
 
         $subject = 'Customer Request information';
-
         $headers  = "From: " . strip_tags($email) . "\r\n";
         $headers .= "Reply-To: " . strip_tags($email) . "\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 
-        $message = '<table style="width:100%;">';
-        $message .= '<tr>';
+        $message = '<table style="width:100%;"><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">First Name</td>';
-        $message .= '<td style="border: 1px solid #000000;"> '.$first_name.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td style="border: 1px solid #000000;"> '.$first_name.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Last Name</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$last_name.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$last_name.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Mobile Number</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$mobile_number.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$mobile_number.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Phone Number</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$phone_number.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$phone_number.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Preferred Contact Method</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$preferred_contact_method.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$preferred_contact_method.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Best Time To Call</td>';
-        $message .= '<td style="border: 1px solid #000000;" >'.$best_time_to_call.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td style="border: 1px solid #000000;" >'.$best_time_to_call.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">City</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$city.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$city.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">State</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$state.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$state.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Zip</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$zip.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$zip.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Cash On Hand Required</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$cash_on_hand_required.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$cash_on_hand_required.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Time Frame To Invest</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$time_frame_to_invest.'</td>';
-        $message .= '</tr>tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$time_frame_to_invest.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Consultation</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$consultation.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$consultation.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Marketing</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$marketing.'</td>';
-        $message .= '</tr><tr>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$marketing.'</td></tr><tr>';
         $message .= '<td style="border: 1px solid #000000; text-align: center">Franchise Title</td>';
-        $message .= '<td  style="border: 1px solid #000000;">'.$titles.'</td>';
-        $message .= '</tr>';
-        $message .= '</table>';
+        $message .= '<td  style="border: 1px solid #000000;">'.$titles.'</td></tr></table>';
 
         if(mail($email, $subject, $message, $headers)){
+            setcookie('post_ids', '', time() + (86400 * 30), "/");
             ?>
             <script>
                 alert('your request is submitted successfully');
@@ -845,7 +846,7 @@ class Cpt_For_Franchises_Short_Code {
             <script>
                 alert('Please try again later');
                 window.location.href = "<?php echo get_home_url(); ?>";
-            </script>
+            </script>s
             <?php
         }
 
