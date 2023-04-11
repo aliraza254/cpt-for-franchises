@@ -72,7 +72,7 @@
 		}
 
 		$('#show-shell').hide();
-
+		
 		var posts = getCookie("post_ids");
 		if (posts) {
 			var count = posts.split(',').length; // count the number of items in the cookie
@@ -81,6 +81,8 @@
 		} else {
 			$('#show-shell').hide();
 		}
+
+
 
 		$('.btn--special').click(function() {
 			// $('#show-shell').hide();

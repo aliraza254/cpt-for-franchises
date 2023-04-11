@@ -191,7 +191,7 @@ class Cpt_For_Franchises_Short_Code {
                     </div>
                 </div>
                 <div class="bar__actions">
-                    <button class="btn btn--simple btn--loog ">
+                    <button class="btn btn--simple btn--loog " target="_blank">
                         Complete Request >
                     </button>
                 </div>
@@ -551,7 +551,7 @@ class Cpt_For_Franchises_Short_Code {
                                             <ul class="list-checkboxes list-checkboxes--remove">
                                                 <?php
 
-//                                                $post_ids = explode(',', $_GET['franchise']);
+
                                                 if(!empty($_COOKIE['post_ids'])){
                                                     $post_ids = explode(',', $_COOKIE['post_ids']);
                                                     $args = array(
@@ -651,7 +651,6 @@ class Cpt_For_Franchises_Short_Code {
                         </aside>
 
                         <div class="form__inner">
-
                             <div style="margin-bottom: 30px;">
                                 <div class="widget__entry-left">
                                     <span class="widget__num">3</span>
@@ -660,9 +659,18 @@ class Cpt_For_Franchises_Short_Code {
                                     <p style="margin: 0">Complete the form below and we'll send your information to all of your franchise selections. You'll have taken your official first step toward business ownership. Plus, it's all free!</p>
                                 </div>
                             </div>
-
                             <form  method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="information_form">
-                                <input type="hidden" name="franchise" value="<?php echo $_COOKIE['post_ids']; ?>">
+                                <?php
+                                $franchise = $_COOKIE['post_ids'];
+//                                $combined_values = array_merge(explode(',', $franchise));
+//                                $unique_values = array_unique($combined_values);
+//                                    print_r($unique_values);
+//                                foreach ($unique_values as $single){
+//                                    $titles =  $single;
+//                                }
+//                                die('hi');
+                                ?>
+                                <input type="hidden" name="franchise" value="<?php echo $franchise; ?>">
                                 <input type="hidden" name="recommended_franchise" value="">
                                 <input type="hidden" value="send_email_to_admin" name="action">
                                 <div class="wts_two_field_main">
@@ -773,14 +781,9 @@ class Cpt_For_Franchises_Short_Code {
         $recommended_franchise = $_POST['recommended_franchise'];
         $combined_values = array_merge(explode(',', $franchise), explode(',', $recommended_franchise));
         $unique_values = array_unique($combined_values);
-        $titles = '<table>';
         foreach ($unique_values as $single){
-            $titles .= '<tr><td>';
-            $titles .= get_the_title( $single );
-            $titles .= '</td></tr>';
+            $titles .= get_the_title( $single ) . "<br>";
         }
-        $titles .= '</table>';
-
         $email = get_option('admin_email');
         $first_name = $_POST['first_name'];
         $last_name = $_POST['last_name'];
@@ -836,17 +839,15 @@ class Cpt_For_Franchises_Short_Code {
             setcookie('post_ids', '', time() + (86400 * 30), "/");
             ?>
             <script>
-                alert('your request is submitted successfully');
-                window.location.href = "<?php echo get_home_url(); ?>";
+                window.location.href = "<?php echo get_home_url(); ?>/thank-you";
             </script>
             <?php
         }
         else{
             ?>
             <script>
-                alert('Please try again later');
                 window.location.href = "<?php echo get_home_url(); ?>";
-            </script>s
+            </script>
             <?php
         }
 
