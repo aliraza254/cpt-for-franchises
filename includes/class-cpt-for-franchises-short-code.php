@@ -662,13 +662,6 @@ class Cpt_For_Franchises_Short_Code {
                             <form  method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="information_form">
                                 <?php
                                 $franchise = $_COOKIE['post_ids'];
-//                                $combined_values = array_merge(explode(',', $franchise));
-//                                $unique_values = array_unique($combined_values);
-//                                    print_r($unique_values);
-//                                foreach ($unique_values as $single){
-//                                    $titles =  $single;
-//                                }
-//                                die('hi');
                                 ?>
                                 <input type="hidden" name="franchise" value="<?php echo $franchise; ?>">
                                 <input type="hidden" name="recommended_franchise" value="">
@@ -835,15 +828,14 @@ class Cpt_For_Franchises_Short_Code {
         $message .= '<td style="border: 1px solid #000000; text-align: center">Franchise Title</td>';
         $message .= '<td  style="border: 1px solid #000000;">'.$titles.'</td></tr></table>';
 
-        if(mail($email, $subject, $message, $headers)){
+        if( mail ( $email, $subject, $message, $headers ) ){
             setcookie('post_ids', '', time() + (86400 * 30), "/");
             ?>
             <script>
                 window.location.href = "<?php echo get_home_url(); ?>/thank-you";
             </script>
             <?php
-        }
-        else{
+        } else{
             ?>
             <script>
                 window.location.href = "<?php echo get_home_url(); ?>";
@@ -852,6 +844,54 @@ class Cpt_For_Franchises_Short_Code {
         }
 
     }
+
+    public function this_meathod_works_on_live_site(){
+        $to = get_option('admin_email');
+        $to = 'ranarazaali08@gmail.com';
+        $subject = 'Customer Request Information';
+        $franchise = sanitize_text_field($_POST['franchise']);
+        $recommended_franchise = sanitize_text_field($_POST['recommended_franchise']);
+        $combined_values = array_merge(explode(',', $franchise), explode(',', $recommended_franchise));
+        $unique_values = array_unique($combined_values);
+        foreach ($unique_values as $single) {
+            $titles .= get_the_title($single) . "<br>";
+        }
+        $body = '<table style="width:100%;">';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Franchise Titles:</td><td>' . $titles . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">First Name:</td><td>' . sanitize_text_field($_POST['first_name']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Last Name:</td><td>' . sanitize_text_field($_POST['last_name']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Mobile Number:</td><td>' . sanitize_text_field($_POST['mobile_number']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Phone Number:</td><td>' . sanitize_text_field($_POST['phone_number']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Preferred Contact Method:</td><td>' . sanitize_text_field($_POST['preferred_contact_method']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Best Time To Call:</td><td>' . sanitize_text_field($_POST['best_time_to_call']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">City:</td><td>' . sanitize_text_field($_POST['city']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">State:</td><td>' . sanitize_text_field($_POST['state']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Zip:</td><td>' . sanitize_text_field($_POST['zip']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Cash On Hand Required:</td><td>' . sanitize_text_field($_POST['cash_on_hand_required']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Time Frame To Invest:</td><td>' . sanitize_text_field($_POST['time_frame_to_invest']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Consultation:</td><td>' . sanitize_text_field($_POST['consultation']) . '</td></tr>';
+        $body .= '<tr><td style="border: 1px solid #000000; text-align: center">Marketing:</td><td>' . sanitize_text_field($_POST['marketing']) . '</td></tr>';
+        $body .= '</table>';
+
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+        // mail send by hosting without html format & wp_mail send by WordPress with html format
+        if( mail($to, $subject, $body, $headers) ){
+            setcookie('post_ids', '', time() + (86400 * 30), "/");
+            ?>
+            <script>
+                window.location.href = "<?php echo get_home_url(); ?>/thank-you";
+            </script>
+            <?php
+        } else{
+            ?>
+            <script>
+                window.location.href = "<?php echo get_home_url(); ?>";
+            </script>
+            <?php
+        }
+
+    }
+
 
 
 }

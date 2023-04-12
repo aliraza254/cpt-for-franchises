@@ -100,6 +100,39 @@ class Cpt_For_Franchises_Admin {
 
 	}
 
+    function init_function(){
+        $page_titles = array('Search Results', 'Request Information');
+        $page_contents = array('[search_post_form]', '[request_information]');
+
+        for ($i = 0; $i < count($page_titles); $i++) {
+            $objPage = new WP_Query(array(
+                'post_type' => 'page',
+                'post_status' => 'publish',
+                'posts_per_page' => 1,
+                'title' => $page_titles[$i],
+            ));
+            if ($objPage->have_posts()) {
+                $objPage->the_post();
+                $page_id = get_the_ID();
+                update_post_meta($page_id, 'post_content', $page_contents[$i]);
+            } else {
+                $page_id = wp_insert_post(
+                    array(
+                        'comment_status' => 'close',
+                        'ping_status' => 'close',
+                        'post_author' => 1,
+                        'post_title' => ucwords($page_titles[$i]),
+                        'post_name' => strtolower(str_replace(' ', '-', trim($page_titles[$i]))),
+                        'post_status' => 'publish',
+                        'post_content' => $page_contents[$i],
+                        'post_type' => 'page',
+                    )
+                );
+            }
+        }
+
+    }
+
     function add_custom_meta_box() {
         add_meta_box(
             'custom-meta-box',

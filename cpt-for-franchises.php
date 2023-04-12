@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       CPT For Franchises
  * Plugin URI:        https://https://webtechsofts.co.uk/
- * Description:       Transform your website and improve your user experience with our new plugin! With just one shortcode, [all_products_list], your visitors can easily browse through all your available listings and add them to a custom form. We've even created a dedicated page, "request-information," where visitors can submit their inquiries with the [request_information] shortcode. And for even more convenience, use the [request_search_form] shortcode to add a category and investment filter to your listings.
+ * Description:       Transform your website and improve your user experience with our new plugin! With just one shortcode, [all_products_list], your visitors can easily browse through all your available listings and add them to a custom form. We've even created a dedicated page, "request-information," where visitors can submit their inquiries. And for even more convenience, use the [request_search_form] shortcode to add a category and investment filter to your listings.
  * Version:           1.0.0
  * Author:            Web Tech Softs
  * Author URI:        https://https://webtechsofts.co.uk/

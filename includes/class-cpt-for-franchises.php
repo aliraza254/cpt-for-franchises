@@ -165,6 +165,7 @@ class Cpt_For_Franchises {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'add_custom_meta_box' );
 		$this->loader->add_action( 'save_post', $plugin_admin, 'save_custom_meta_box_data' );
+		$this->loader->add_action( 'init', $plugin_admin, 'init_function' );
 
 	}
 
@@ -181,10 +182,10 @@ class Cpt_For_Franchises {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-		$this->loader->add_action( 'wp_ajax_add_post_in_session', $plugin_public, 'add_post_in_session' );
-		$this->loader->add_action( 'wp_ajax_nopriv_add_post_in_session', $plugin_public, 'add_post_in_session' );
-		$this->loader->add_action( 'wp_ajax_remove_post_in_session', $plugin_public, 'remove_post_in_session' );
-		$this->loader->add_action( 'wp_ajax_nopriv_remove_post_in_session', $plugin_public, 'remove_post_in_session' );
+		$this->loader->add_action( 'wp_ajax_add_post_in_session', $plugin_public, 'add_post_in_session', 99 );
+		$this->loader->add_action( 'wp_ajax_nopriv_add_post_in_session', $plugin_public, 'add_post_in_session', 99 );
+		$this->loader->add_action( 'wp_ajax_remove_post_in_session', $plugin_public, 'remove_post_in_session', 99 );
+		$this->loader->add_action( 'wp_ajax_nopriv_remove_post_in_session', $plugin_public, 'remove_post_in_session', 99 );
 
 	}
 
